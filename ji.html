@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>卂𝔪 Ṽ̶เק Predictor</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000;
+      color: #fff;
+      height: 100vh;
+    }
+    iframe {
+      width: 100%;
+      height: 100vh;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Buttons */
+    .btn {
+      background: #111;
+      color: #ff0044;
+      border: 1px solid #ff0044;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .btn:hover { 
+      background: #ff0044; 
+      color: #000; 
+      transform: translateY(-2px); 
+      box-shadow: 0 0 10px rgba(255, 0, 68, 0.5);
+    }
+
+    /* Predictor Box */
+    #predictorBox {
+      width: 220px;
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #ff0055;
+      border-radius: 12px;
+      position: absolute;
+      top: 60px;
+      left: 20px;
+      z-index: 9999;
+      padding: 15px;
+      text-align: center;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 0 15px #ff0055aa;
+      cursor: grab;
+    }
+    #predictorBox h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #ff0044;
+      text-shadow: 0 0 5px rgba(255,0,68,0.5);
+    }
+    .period, .timer {
+      margin: 8px 0;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .period-label, .timer-label { color: #aaa; }
+    .timer { color: yellow; font-weight: bold; }
+
+    /* Result */
+    #resultPlayer {
+      margin: 15px 0;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 8px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #resultPlayer.big {
+      color: #00ff66;
+      background: rgba(0,255,102,0.1);
+      box-shadow: 0 0 10px rgba(0,255,102,0.3);
+    }
+    #resultPlayer.small {
+      color: #ff3366;
+      background: rgba(255,51,102,0.1);
+      box-shadow: 0 0 10px rgba(255,51,102,0.3);
+    }
+    #resultPlayer.animate {
+      transform: scale(1.4);
+      opacity: 0.8;
+    }
+
+    /* Logo */
+    #showPredictorLogo {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 9999;
+      transition: transform 0.3s ease;
+    }
+    #showPredictorLogo img {
+      width: 90%;
+      height: 90%;
+      border-radius: 50%;
+      border: 2px solid #00ffcc;
+      box-shadow: 0 0 10px #00ffcc;
+    }
+    #showPredictorLogo:hover { transform: scale(1.1); }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0,255,204,0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(0,255,204,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,255,204,0); }
+    }
+
+    /* Login Panel */
+    #loginPanel { 
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      width: 200px;
+      background: rgba(0,0,0,0.95);
+      border: 2px solid #00ffcc;
+      border-radius: 12px;
+      padding: 2px;
+      text-align: center;
+      box-shadow: 0 0 20px #00ffccaa;
+      backdrop-filter: blur(5px);
+      z-index: 9999;
+      cursor: grab;
+    }
+    #loginPanel h1 { 
+      color: #ff0044; 
+      margin-bottom: 10px; 
+      font-size: 24px; 
+      text-shadow: 0 0 5px rgba(255,0,68,0.5); 
+    }
+    #loginPanel p { 
+      font-size: 14px; 
+      color: #bbb; 
+      margin-bottom: 20px; 
+    }
+
+    #uidInput {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      text-align: center;
+      border-radius: 6px;
+      border: 1px solid #ff0044;
+      background: #111;
+      color: #fff;
+      transition: all 0.3s;
+    }
+    #uidInput:focus { 
+      outline: none; 
+      border-color: #00ffcc; 
+      box-shadow: 0 0 8px rgba(0,255,204,0.5); 
+    }
+
+    .error-message { 
+      color: #ff3366; 
+      font-size: 12px; 
+      margin-top: 5px; 
+      display: none; 
+    }
+    .loader {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #00ffcc;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* History Panel */
+    #historyPanel {
+      width: 200px;
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #00aaff;
+      border-radius: 12px;
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      z-index: 9999;
+      padding: 15px;
+      text-align: center;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 0 15px #00aaffaa;
+      cursor: grab;
+    }
+    #historyPanel h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #00aaff;
+    }
+    #historyList {
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Settings Panel */
+    #settingsPanel {
+      width: 200px;
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #ffaa00;
+      border-radius: 12px;
+      position: absolute;
+      bottom: 60px;
+      left: 20px;
+      z-index: 9999;
+      padding: 15px;
+      text-align: center;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 0 15px #ffaa00aa;
+      cursor: grab;
+    }
+    #settingsPanel h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      font-weight: bold;
+      color: #ffaa00;
+    }
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    /* Control Panel */
+    .control-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 9999;
+    }
+
+    @media (max-width: 250px) {
+      #predictorBox, #loginPanel, #historyPanel, #settingsPanel { 
+        width: 90%; 
+        left: 50%; 
+        right: 50%;
+        top: 10px; 
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- 🔐 LOGIN PANEL -->
+  <div id="loginPanel" class="draggable hidden">
+    <h1>𓄂卂𝔪 Ṽ̶เק⍣</h1>  
+    <p>UID id ples✨</p>
+    <input type="password" id="uidInput" placeholder="Enter UID" autocomplete="off"/>
+    <div class="error-message" id="errorMessage">Invalid UID. Please try again.</div>
+    <div class="loader" id="loginLoader"></div>
+    <button class="btn" id="loginBtn">Login</button>
+  </div>
+
+  <!-- 🧠 PREDICTOR BOX -->
+  <div id="predictorBox" class="draggable hidden">
+    <h3>𓄂卂𝔪 Ṽ̶เק⍣ </h3>
+    <div class="period">
+      <span class="period-label">📅 Period:</span>
+      <span class="period-value" id="textview1Player">--</span>
+    </div>
+    <div class="timer">
+      <span class="timer-label">⏱</span>
+      <span class="timer-value" id="textview2Player">00:30</span>
+    </div>
+    <div id="resultPlayer">--</div>
+    <div class="buttons">
+      <button class="btn" onclick="toggleHistory()">HISTORY</button>
+      <button class="btn" onclick="hideBox()">HIDE</button>
+    </div>
+  </div>
+
+  <!-- 📊 HISTORY PANEL -->
+  <div id="historyPanel" class="draggable hidden">
+    <h3>Prediction History</h3>
+    <div id="historyList">
+      <!-- History items will be added here -->
+    </div>
+    <button class="btn" onclick="toggleHistory()">CLOSE</button>
+  </div>
+
+  <!-- ⚙️ SETTINGS PANEL -->
+  <div id="settingsPanel" class="draggable hidden">
+    <h3>Settings</h3>
+    <div class="setting-item">
+      <span>Sound Effects</span>
+      <input type="checkbox" id="soundToggle" checked>
+    </div>
+    <div class="setting-item">
+      <span>Notifications</span>
+      <input type="checkbox" id="notificationsToggle" checked>
+    </div>
+    <div class="setting-item">
+      <span>Auto-hide</span>
+      <input type="checkbox" id="autohideToggle">
+    </div>
+    <button class="btn" onclick="toggleSettings()">CLOSE</button>
+  </div>
+
+  <!-- 🌀 FLOATING LOGO -->
+  <div id="showPredictorLogo" class="pulse" onclick="showBox()">
+    <img src="https://i.ibb.co/4nG9q6c1/1000-png.png" alt="Open Predictor"/>
+  </div>
+
+  <!-- 🎛️ CONTROL PANEL -->
+  <div class="control-panel">
+    <button class="btn" onclick="toggleSettings()">SETTINGS</button>
+    <button class="btn" onclick="logout()">LOGOUT</button>
+  </div>
+
+  <!-- 🌍 BACKGROUND -->
+  <iframe src="https://tinyurl.com/AMVIP366"></iframe>
+
+  <!-- ⚡ SCRIPTS -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const box = document.getElementById('predictorBox');
+      const showLogo = document.getElementById('showPredictorLogo');
+      const periodElem = document.getElementById('textview1Player');
+      const timerElem = document.getElementById('textview2Player');
+      const resultElem = document.getElementById('resultPlayer');
+      const loginPanel = document.getElementById('loginPanel');
+      const uidInput = document.getElementById('uidInput');
+      const loginBtn = document.getElementById('loginBtn');
+      const errorMessage = document.getElementById('errorMessage');
+      const loginLoader = document.getElementById('loginLoader');
+      const historyPanel = document.getElementById('historyPanel');
+      const historyList = document.getElementById('historyList');
+      const settingsPanel = document.getElementById('settingsPanel');
+
+      let timerInterval, lastPeriodNumber = "";
+      let isLoggedIn = false;
+      let predictionHistory = [];
+      let settings = {
+        sound: true,
+        notifications: true,
+        autohide: false
+      };
+
+      const allowedUIDs = new Set(["3697391","3653959","3607271","3498715","3464176","3456200","275200","256689","221732","3658907","965368","3654872","273876"]);
+
+      // Load settings from localStorage
+      const savedSettings = localStorage.getItem('predictorSettings');
+      if (savedSettings) {
+        settings = {...settings, ...JSON.parse(savedSettings)};
+        document.getElementById('soundToggle').checked = settings.sound;
+        document.getElementById('notificationsToggle').checked = settings.notifications;
+        document.getElementById('autohideToggle').checked = settings.autohide;
+      }
+
+      // Load history from localStorage
+      const savedHistory = localStorage.getItem('predictionHistory');
+      if (savedHistory) {
+        predictionHistory = JSON.parse(savedHistory);
+        updateHistoryDisplay();
+      }
+
+      // 🧑 Login
+      loginBtn.addEventListener("click", handleLogin);
+      uidInput.addEventListener("keypress", e => { if (e.key === "Enter") handleLogin(); });
+
+      function handleLogin() {
+        const uid = uidInput.value.trim();
+        if (!uid) return showError("Please enter a UID");
+
+        loginBtn.classList.add('hidden');
+        loginLoader.style.display = "block";
+
+        setTimeout(() => allowedUIDs.has(uid) ? loginSuccess() : loginFailed(), 1000);
+      }
+
+      function loginSuccess() {
+        isLoggedIn = true;
+        loginPanel.classList.add('hidden');
+        box.classList.remove('hidden');
+        loginLoader.style.display = "none";
+        hideError();
+        init();
+      }
+
+      function loginFailed() {
+        showError("Invalid UID. Please try again.");
+        loginBtn.classList.remove('hidden');
+        loginLoader.style.display = "none";
+      }
+
+      function showError(msg) {
+        errorMessage.textContent = msg;
+        errorMessage.style.display = "block";
+        uidInput.style.borderColor = "#ff3366";
+      }
+      
+      function hideError() {
+        errorMessage.style.display = "none";
+        uidInput.style.borderColor = "#ff0044";
+      }
+
+      // ⚡ Init
+      function init() {
+        document.querySelectorAll('.draggable').forEach(el => makeDraggable(el));
+        startTimer();
+        updateResults();
+        setInterval(updateResults, 30000);
+      }
+
+      // ⏳ Timer
+      function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          const now = new Date();
+          const remaining = 30 - (now.getUTCSeconds() % 30);
+          timerElem.textContent = `00:${String(remaining).padStart(2,'0')}`;
+          if (remaining === 30) updateResults();
+        }, 1000);
+      }
+
+      // 🖱️ Draggable
+      function makeDraggable(el) {
+        let isDragging = false, offsetX = 0, offsetY = 0;
+
+        const start = (x, y) => {
+          isDragging = true;
+          offsetX = x - el.offsetLeft;
+          offsetY = y - el.offsetTop;
+          el.style.cursor = 'grabbing';
+        };
+        
+        const move = (x, y) => {
+          if (!isDragging) return;
+          el.style.left = `${x - offsetX}px`;
+          el.style.top = `${y - offsetY}px`;
+        };
+        
+        const stop = () => {
+          isDragging = false;
+          el.style.cursor = 'grab';
+        };
+
+        el.addEventListener('mousedown', e => { 
+          if (e.target.tagName !== "BUTTON" && e.target.type !== "checkbox") 
+            start(e.clientX, e.clientY); 
+        });
+        document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+        document.addEventListener('mouseup', stop);
+
+        el.addEventListener('touchstart', e => { 
+          if (e.target.tagName !== "BUTTON" && e.target.type !== "checkbox") 
+            start(e.touches[0].clientX, e.touches[0].clientY); 
+        });
+        document.addEventListener('touchmove', e => move(e.touches[0].clientX, e.touches[0].clientY));
+        document.addEventListener('touchend', stop);
+      }
+
+      // 🧭 Controls
+      window.hideBox = () => { 
+        box.classList.add('hidden'); 
+        showLogo.classList.remove('hidden'); 
+      };
+
+      window.showBox = () => { 
+        if (!isLoggedIn) { 
+          loginPanel.classList.remove('hidden'); 
+          return; 
+        } 
+        box.classList.remove('hidden'); 
+        showLogo.classList.add('hidden'); 
+      };
+
+      window.toggleHistory = () => {
+        if (historyPanel.classList.contains('hidden')) {
+          historyPanel.classList.remove('hidden');
+          box.classList.add('hidden');
+        } else {
+          historyPanel.classList.add('hidden');
+          box.classList.remove('hidden');
+        }
+      };
+
+      window.toggleSettings = () => {
+        settingsPanel.classList.toggle('hidden');
+      };
+
+      window.logout = () => {
+        if (confirm("Are you sure you want to logout?")) {
+          isLoggedIn = false;
+          box.classList.add('hidden');
+          historyPanel.classList.add('hidden');
+          settingsPanel.classList.add('hidden');
+          loginPanel.classList.remove('hidden');
+          clearInterval(timerInterval);
+        }
+      };
+      
+      // 🧮 Result Logic
+      function calculatePeriodNumber() {
+        const now = new Date();
+        const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+        return `${now.getUTCFullYear()}${String(now.getUTCMonth()+1).padStart(2,'0')}${String(now.getUTCDate()).padStart(2,'0')}1000${10001+totalMinutes}`;
+      }
+
+      function getResult() {
+        const number = Math.floor(Math.random() * 10);
+        const type = number >= 5 ? "Big" : "Small";
+        return { number, type };
+      }
+
+      function updateResults() {
+        const periodNumber = calculatePeriodNumber();
+        if (periodNumber !== lastPeriodNumber) {
+          lastPeriodNumber = periodNumber;
+          const { number, type } = getResult();
+          periodElem.textContent = periodNumber;
+          resultElem.textContent = `${type} (${number})`;
+          resultElem.className = '';
+          resultElem.classList.add(type.toLowerCase(), 'animate');
+          
+          // Add to history
+          predictionHistory.unshift({
+            period: periodNumber,
+            result: `${type} (${number})`,
+            timestamp: new Date().toLocaleTimeString()
+          });
+          
+          // Keep only last 10 entries
+          if (predictionHistory.length > 10) {
+            predictionHistory = predictionHistory.slice(0, 10);
+          }
+          
+          // Save to localStorage
+          localStorage.setItem('predictionHistory', JSON.stringify(predictionHistory));
+          
+          // Update history display
+          updateHistoryDisplay();
+          
+          // Play sound if enabled
+          if (settings.sound) {
+            playResultSound(type);
+          }
+          
+          // Show notification if enabled
+          if (settings.notifications) {
+            showNotification(type, number);
+          }
+          
+          setTimeout(() => resultElem.classList.remove('animate'), 300);
+        }
+      }
+
+      function updateHistoryDisplay() {
+        historyList.innerHTML = '';
+        predictionHistory.forEach(item => {
+          const historyItem = document.createElement('div');
+          historyItem.className = 'history-item';
+          historyItem.innerHTML = `
+            <span>${item.period}</span>
+            <span>${item.result}</span>
+            <span>${item.timestamp}</span>
+          `;
+          historyList.appendChild(historyItem);
+        });
+      }
+
+      function playResultSound(type) {
+        // In a real implementation, you would play an actual sound file
+        console.log(`Playing ${type} result sound`);
+      }
+
+      function showNotification(type, number) {
+        if ("Notification" in window && Notification.permission === "granted") {
+          new Notification(`AM VIP Predictor - ${type}`, {
+            body: `Prediction: ${type} (${number})`,
+            icon: "https://i.ibb.co/4nG9q6c1/1000-png.png"
+          });
+        }
+      }
+
+      // Settings event listeners
+      document.getElementById('soundToggle').addEventListener('change', (e) => {
+        settings.sound = e.target.checked;
+        localStorage.setItem('predictorSettings', JSON.stringify(settings));
+      });
+
+      document.getElementById('notificationsToggle').addEventListener('change', (e) => {
+        settings.notifications = e.target.checked;
+        if (settings.notifications && "Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission();
+        }
+        localStorage.setItem('predictorSettings', JSON.stringify(settings));
+      });
+
+      document.getElementById('autohideToggle').addEventListener('change', (e) => {
+        settings.autohide = e.target.checked;
+        localStorage.setItem('predictorSettings', JSON.stringify(settings));
+      });
+
+      // Request notification permission if needed
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+      }
+    });
+  </script>
+</body>
+</html>
