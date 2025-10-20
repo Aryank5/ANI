@@ -364,7 +364,7 @@
     <div class="card">
         <h3>Subordinate Management</h3>
         <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-            <input type="text" id="subUID" placeholder="Enter Subordinate UID" pattern="[0-9]{8,}" title="Enter a valid UID (numbers only, min 8 digits)">
+            <input type="text" id="subUID" placeholder="Enter Subordinate UID" pattern="[0-9]{8,}" title="Enter a valid UID (numbers only, min 7 digits)">
             <button class="success" onclick="addSubordinate()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
@@ -567,9 +567,9 @@
                 return;
             }
             
-            // Validate UID format (numbers only, min 8 digits)
-            if (!/^\d{8,}$/.test(uid)) {
-                showToast('Invalid UID format. Use numbers only (min 8 digits)', 'error');
+            // Validate UID format (numbers only, min 7 digits)
+            if (!/^\d{7,}$/.test(uid)) {
+                showToast('Invalid UID format. Use numbers only (min 7 digits)', 'error');
                 return;
             }
             
