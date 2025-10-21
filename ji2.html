@@ -231,7 +231,20 @@
       background: rgba(0, 255, 204, 0.1);
       transform: translateY(-2px);
     }
-  
+  .tag3 {
+      position: absolute;
+      top: -8px;
+      right: 0px;
+      background: #FFD700;
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1;
+      letter-spacing: 0.5px;
+    }
     
     /* Predictor Box */
     #predictorBox {
@@ -244,6 +257,7 @@
     }
     
     #predictorBox h3 {
+      font-size: 24px;
       color: var(--primary-color);
     }
     
@@ -589,11 +603,27 @@
     }
     
     /* Button Group */
+  
     .button-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 15px;
+      gap: 10px;                  
+      margin-top: 10px;
+    }
+    .button-group2 {
+      display: flex;
+      flex-direction: column;
+      width:50%;
+      gap: 10px;                  
+      margin-top: 10px;
+    }
+      .button-group3 {
+      display: flex;
+      flex-direction: column;
+      width:50%;
+      gap: 10px;  
+      margin-left: 100px;        
+      margin-top: -30px;
     }
   
            /* Animations */
@@ -724,7 +754,7 @@
 
   <!-- 🧠 PREDICTOR BOX -->
   <div id="predictorBox" class="panel hidden">
-   <span class="btn-tag">PAID PRO</span>
+   <span class="tag3">PAID PRO</span>
     <h3>𓄂卂𝔪 Ṽ̶เק⍣</h3>
     <div class="period">
       <span class="period-label">📅 Period:</span>
@@ -735,11 +765,14 @@
       <span class="timer-value" id="textview2Player">00:30</span>
     </div>
     <div id="resultPlayer">--</div>
-    <div class="button-group">
+    
+    <div class="button-group2">
       <button class="btn btn-info" onclick="toggleHistory()">
         <i class="fas fa-history"></i>
         HISTORY
       </button>
+    </div>
+       <div class="button-group3">
       <button class="btn btn-secondary" onclick="hideBox()">
         <i class="fas fa-eye-slash"></i>
         HIDE
@@ -1053,7 +1086,7 @@
           this.lastPeriodNumber = periodNumber;
           const { number, type } = this.getResult();
           this.periodElem.textContent = periodNumber;
-          this.resultElem.textContent = `${type} (${number})`;
+          this.resultElem.textContent = `${type} ${number}`;
           this.resultElem.className = '';
           this.resultElem.classList.add(type.toLowerCase(), 'animate');
           
