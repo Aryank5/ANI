@@ -86,7 +86,7 @@
      
     /* Buttons */
     .btn {
-      background: #111;
+      background: linear-gradient(135deg, #ff8a50, #e62eff);
       border: 1px solid var(--primary-color);
       color: var(--primary-color);
       padding: 8px 12px;
@@ -262,13 +262,13 @@
     }
     
     .period, .timer {
-      margin: 10px 0;
+      margin: 5px 0;
       font-size: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 5px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 1px 0;
+      border-bottom: 0px solid rgba(255,255,255,0.1);
     }
     
     .period-label, .timer-label { 
@@ -282,7 +282,7 @@
     
     /* Result Display */
     #resultPlayer {
-      margin: 15px 0;
+      margin: 5px 0;
       font-size: 20px;
       font-weight: bold;
       padding: 10px;
@@ -726,17 +726,21 @@
   <!-- 🔐 LOGIN PANEL -->
   <div id="loginPanel" class="panel hidden">   
     <button class="btn-tag2" onclick="minimizeLogin()">X</button>
-
-    <h1>𓄂卂𝔪 Ṽ̶เק⍣</h1>  
+           <h1>𓄂卂𝔪 Ṽ̶เק⍣</h1>  
     <p></p>
+    
     <input type="password" id="uidInput" placeholder="Enter UID" autocomplete="off"/>
     <div class="error-message" id="errorMessage">Invalid UID. Please try again.</div>
     <div class="loader" id="loginLoader"></div>
-    <button class="btn" id="loginBtn">Login</button>
+    <button class="btn" id="loginBtn">
+    <i class="fa fa-key"></i>
+              <span>Login</span>
+      </button>
+
     
     <div class="button-group">
       <button class="btn btn-register" id="supportBtn">
-        <i class="fas fa-user-plus"></i>
+       <i class="fa-solid fa-images"></i>
         <span>Proof</span>
       </button>
                   
@@ -946,9 +950,9 @@
       
       setupExternalButtons() {
         // Setup buttons with external links
-        this.setupButton('registerBtn', 'https://tinyurl.com/AMVIP36655');
-        this.setupButton('supportBtn', 'https://tinyurl.com/AMVIP367');
-        this.setupButton('telegramBtn', 'index.html');
+        this.setupButton('registerBtn', 'photo.html');
+        this.setupButton('supportBtn', 'https://tinyurl.com/AMVIP36');
+        this.setupButton('telegramBtn', 'video.html');
       }
       
       setupButton(buttonId, url) {
