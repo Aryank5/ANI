@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AM VIP Predictor</title>
+  
+  <!-- Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-color: #ff0044;
+      --secondary-color: #00ffcc;
+      --accent-color: #ffaa00;
+      --info-color: #00aaff;
+      --success-color: #00ff66;
+      --danger-color: #ff3366;
+      --bg-dark: #000;
+      --bg-card: rgba(0,0,0,0.9);
+      --text-light: #fff;
+      --text-muted: #aaa;
+      --border-radius: 12px;
+      --border-radius-sm: 6px;
+      --shadow-glow: 0 0 15px;
+      --transition: all 0.3s ease;
+      --transition-fast: all 0.25s;
+    }
+    
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      line-height: 1.5;
+    }
+    
+    iframe {
+      width: 100%;
+      height: 100vh;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    
+    .hidden { 
+      display: none !important; 
+    }
+    
+    /* Panel Base Styles */
+    .panel {
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      position: absolute;
+      z-index: 9999;
+      padding: 15px;
+      text-align: center;
+      backdrop-filter: blur(5px);
+      cursor: grab;
+      animation: fadeIn 0.3s ease;
+      border: 2px solid;
+
+    }
+      
+    .panel:hover {
+      transform: translateY(-2px);
+    }
+    
+    .panel h3 {
+      margin: 0 0 15px 0;
+      font-size: 16px;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(255,0,68,0.5);
+    }
+     
+    /* Buttons */
+    .btn {
+      background: linear-gradient(135deg, #ff8a50, #e62eff);
+      border: 1px solid var(--primary-color);
+      color: var(--primary-color);
+      padding: 8px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    
+    .btn:hover { 
+      background: var(--primary-color); 
+      color: #000; 
+      transform: translateY(-2px); 
+      box-shadow: 0 0 10px rgba(255, 0, 68, 0.5);
+    }
+    
+    .btn-secondary {
+      border-color: var(--secondary-color);
+      color: var(--secondary-color);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--secondary-color);
+      color: #000;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+    }
+    
+    .btn-accent {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+    
+    .btn-accent:hover {
+      background: var(--accent-color);
+      color: #000;
+      box-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+    }
+    
+    .btn-info {
+      border-color: var(--info-color);
+      color: var(--info-color);
+    }
+    
+    .btn-info:hover {
+      background: var(--info-color);
+      color: #000;
+      box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+    }
+    
+    .close-btn:hover {
+      color: var(--danger-color);
+      background: transparent;
+      transform: scale(1.1);
+    }
+    
+    /* Special Buttons */
+    .btn-register {    
+      background: linear-gradient(135deg, #ba68c8, #7b1fa2);
+      color: white;
+      border: none;
+      box-shadow: 0 0 10px rgba(156, 39, 176, 0.7), 0 4px 10px rgba(156, 39, 176, 0.3);
+      position: relative;
+      overflow: hidden;
+      width: 35%;
+      margin-top: 0px;
+    }
+    
+    .btn-support {
+      background: linear-gradient(135deg, #ff8a00, #e52e71);
+      color: white;
+      border: none;
+      box-shadow: 0 0 10px rgba(229, 46, 113, 0.7);
+      position: relative;
+      overflow: hidden;
+      width: 35%;
+      button:30px;
+      margin-top: -40px;
+      margin-left: 70px;
+    }
+    
+    .btn-telegram {
+      background: linear-gradient(135deg, #0088cc, #00aced);
+      color: white;
+      border: none;
+      box-shadow: 0 0 10px rgba(0, 170, 237, 0.7);
+      width: 35%;
+      
+      margin-top: -35px;
+      margin-left: 140px;
+    }
+    
+    .btn-tag {
+      position: absolute;
+      top: -5px;
+      right: -10px;
+      background: #FFD700;
+      color: #000;
+      font-size: 1px;
+      font-weight: 700;
+      padding: 4px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1;
+      letter-spacing: 0.5px;
+    }
+  
+  .btn-tag2 {
+      position: absolute;
+      width: 40px;
+      top: 0px;
+      right: 0px;
+      background: linear-gradient(13deg, #ff8a00, #e52e71);
+      color: #000;
+      font-size: 5px;
+      font-weight: 700;
+      padding: 5px;
+      border-radius: 10px;
+        box-shadow: var(--shadow-glow) rgba(255, 0, 85, 0.67);   
+      z-index: 1;
+      letter-spacing: 1.5px;
+    }
+   .btn-tag2:hover {
+      background: rgba(0, 255, 204, 0.1);
+      transform: translateY(-2px);
+    }
+  .tag3 {
+      position: absolute;
+      top: -8px;
+      right: 0px;
+      background: #FFD700;
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Predictor Box */
+    #predictorBox {
+      width: 220px;
+      border: 2px solid var(--primary-color);
+      box-shadow: var(--shadow-glow) rgba(255, 0, 85, 0.67);
+      top: 60px;
+      left: 20px;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    #predictorBox h3 {
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+    
+    .period, .timer {
+      margin: 5px 0;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1px 0;
+      border-bottom: 0px solid rgba(255,255,255,0.1);
+    }
+    
+    .period-label, .timer-label { 
+      color: var(--text-muted); 
+    }
+    
+    .timer { 
+      color: var(--accent-color); 
+      font-weight: bold; 
+    }
+    
+    /* Result Display */
+    #resultPlayer {
+      margin: 5px 0;
+      font-size: 20px;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: var(--border-radius-sm);
+      background: rgba(0,0,0,0.3);
+      transition: var(--transition);
+      min-height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #resultPlayer.big {
+      color: var(--success-color);
+      background: rgba(0,255,102,0.1);
+      box-shadow: 0 0 10px rgba(0,255,102,0.3);
+    }
+    
+    #resultPlayer.small {
+      color: var(--danger-color);
+      background: rgba(255,51,102,0.1);
+      box-shadow: 0 0 10px rgba(255,51,102,0.3);
+    }
+    
+    #resultPlayer.animate {
+      transform: scale(1.4);
+      opacity: 0.8;
+    }
+    
+    /* Login Panel */
+    #loginPanel { 
+      width: 240px;
+      border: 2px solid var(--secondary-color);
+      box-shadow: var(--shadow-glow) rgba(0, 255, 204, 0.67);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    #loginPanel h1 { 
+      color: var(--primary-color); 
+      margin-bottom: 10px; 
+      font-size: 24px; 
+      text-shadow: 0 0 5px rgba(255,0,68,0.5); 
+    }
+    
+    #loginPanel p { 
+      font-size: 14px; 
+      color: var(--text-muted); 
+      margin-bottom: 20px; 
+    }
+  
+  .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    #uidInput {
+      width: 90%;
+      padding: 12px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      text-align: center;
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--primary-color);
+      background: #111;
+      color: var(--text-light);
+      transition: var(--transition);
+    }
+    
+    #uidInput:focus { 
+      outline: none; 
+      border-color: var(--secondary-color); 
+      box-shadow: 0 0 8px rgba(0,255,204,0.5); 
+    }
+  
+   .login-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+  
+   .btn-login {
+      flex: 1;
+    }
+  .btn-exit {
+      background: #111;
+      border-color: var(--danger-color);
+      color: var(--danger-color);
+    }
+
+    .btn-exit:hover {
+      background: var(--danger-color);
+      color: var(--bg-dark);
+    }
+    
+    .error-message { 
+      color: var(--danger-color); 
+      font-size: 12px; 
+      margin-top: 5px; 
+      padding: 8px;
+      border-radius: var(--border-radius-sm);
+      background: rgba(255, 51, 102, 0.1);  
+      display: none; 
+    }
+  
+    
+    .loader {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: var(--secondary-color);
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    /* History Panel */
+    #historyPanel {
+      width: 260px;
+      border: 2px solid var(--info-color);
+      box-shadow: var(--shadow-glow) rgba(0, 170, 255, 0.67);
+      top: 20px;
+      right: 20px;
+      animation: float 6s ease-in-out infinite 1s;
+    }
+    
+    #historyPanel h3 {
+      color: var(--info-color);
+    }
+    
+    #historyList {
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 12px;
+      margin-bottom: 10px;
+      border-radius: var(--border-radius-sm);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px;
+    }
+    
+    /* Custom Scrollbar */
+    #historyList::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    #historyList::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+    
+    #historyList::-webkit-scrollbar-thumb {
+      background: var(--info-color);
+      border-radius: 10px;
+    }
+    
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition-fast);
+    }
+    
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: var(--border-radius-sm);
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* Settings Panel */
+    #settingsPanel {
+      width: 200px;
+      border: 2px solid var(--accent-color);
+      box-shadow: var(--shadow-glow) rgba(255, 170, 0, 0.67);
+      bottom: 60px;
+      left: 20px;
+    }
+    
+    #settingsPanel h3 {
+      color: var(--accent-color);
+    }
+    
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 12px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Toggle Switch */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 10px;
+      height: 5px;
+    }
+    
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #333;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: var(--secondary-color);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+    
+    /* Floating Logo */
+    #showPredictorLogo {
+      position: fixed;
+      top: 20px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 10000;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #showPredictorLogo img {
+      width: 80%;
+      height: 80%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--secondary-color);
+      box-shadow: 0 0 10px var(--secondary-color);
+    }
+    
+    #showPredictorLogo:hover { 
+      transform: scale(1.1); 
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.8);
+
+    }
+    
+    .pulse { 
+      margin-top: 450px; 
+      animation: pulse 2s infinite; 
+    }
+    
+    /* Control Panel */
+    .control-panel {
+      position: fixed;
+      width: 20px;
+      right: 80px;
+      top:85%;    
+      gap: 20px;
+      z-index: 10000;
+    }
+
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: var(--border-radius-sm);
+      background: var(--bg-card);
+      border-left: 4px solid;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 10001;
+      animation: fadeIn 0.3s ease;
+      max-width: 300px;
+    }
+    
+    .notification.success {
+      border-left-color: var(--success-color);
+      color: var(--success-color);
+    }
+    
+    .notification.error {
+      border-left-color: var(--danger-color);
+      color: var(--danger-color);
+    }
+    
+    .notification.info {
+      border-left-color: var(--info-color);
+      color: var(--info-color);
+    }
+    
+    /* Button Group */
+  
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;                  
+      margin-top: 10px;
+    }
+    .button-group2 {
+      display: flex;
+      flex-direction: column;
+      width:50%;
+      gap: 10px;                  
+      margin-top: 10px;
+    }
+      .button-group3 {
+      display: flex;
+      flex-direction: column;
+      width:50%;
+      gap: 10px;  
+      margin-left: 100px;        
+      margin-top: -30px;
+    }
+  
+           /* Animations */
+    @keyframes pulse {
+      0% { 
+        box-shadow: 0 0 0 0 rgba(0, 255, 204, 0.7); 
+      }
+      70% { 
+        box-shadow: 0 0 0 15px rgba(0, 255, 204, 0); 
+      }
+      100% { 
+        box-shadow: 0 0 0 0 rgba(0, 255, 204, 0); 
+      }
+    }
+
+    @keyframes spin { 
+      to { 
+        transform: rotate(360deg); 
+      } 
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 5px; }
+      50% { box-shadow: 0 0 20px; }
+      100% { box-shadow: 0 0 5px; }
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Mini Login */
+    #miniLogin {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--secondary-color);
+      border-radius: var(--border-radius-sm);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 10000;
+    }
+    
+    #miniLogin:hover {
+      background: rgba(0, 255, 204, 0.1);
+      transform: translateY(-2px);
+    }
+      #miniLogin.hidden {
+      display: none;
+    }
+    
+    .login-icon {
+      color: var(--secondary-color);
+      font-size: 16px;
+    }
+  
+      /* Responsive */
+    @media (max-width: 300px) {
+      .panel {
+        width: 100% !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+      }
+      
+      #loginPanel {
+        top: 20px;
+        transform: translateX(-50%);
+      }
+    }
+    
+
+  </style>
+</head>
+<body>
+  <!-- 🌍 BACKGROUND -->
+  <iframe src="https://tinyurl.com/AMVIP366"></iframe>
+
+  <!-- Mini Login Button (when logged out) -->
+  <div id="miniLogin" class="hidden">
+    <span class="login-icon">🔑</span>
+  </div>
+
+  <!-- 🔐 LOGIN PANEL -->
+  <div id="loginPanel" class="panel hidden">   
+    <button class="btn-tag2" onclick="minimizeLogin()">X</button>
+           <h1>𓄂卂𝔪 Ṽ̶เק⍣</h1>  
+    <p></p>
+    
+    <input type="password" id="uidInput" placeholder="Enter UID" autocomplete="off"/>
+    <div class="error-message" id="errorMessage">Invalid UID. Please try again.</div>
+    <div class="loader" id="loginLoader"></div>
+    <button class="btn" id="loginBtn">
+    <i class="fa fa-key"></i>
+              <span>Login</span>
+      </button>
+
+    
+    <div class="button-group">
+      <button class="btn btn-register" id="supportBtn">
+       <i class="fa-solid fa-images"></i>
+        <span>Proof</span>
+      </button>
+                  
+      <button class="btn btn-support" id="registerBtn">
+        <i class="fas fa-headset"></i>
+        <span>Support</span>
+      </button>       
+      
+      <button class="btn btn-telegram" id="telegramBtn">
+        <i class="fa-solid fa-video"></i>
+        <span>Video</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 🧠 PREDICTOR BOX -->
+  <div id="predictorBox" class="panel hidden">
+   <span class="tag3">PAID PRO</span>
+    <h3>𓄂卂𝔪 Ṽ̶เק⍣</h3>
+    <div class="period">
+      <span class="period-label">📅 Period:</span>
+      <span class="period-value" id="textview1Player">--</span>
+    </div>
+    <div class="timer">
+      <span class="timer-label">⏱ Time:</span>
+      <span class="timer-value" id="textview2Player">00:60</span>
+    </div>
+    <div id="resultPlayer">--</div>
+    
+    <div class="button-group2">
+      <button class="btn btn-info" onclick="toggleHistory()">
+        <i class="fas fa-history"></i>
+        HISTORY
+      </button>
+    </div>
+       <div class="button-group3">
+      <button class="btn btn-secondary" onclick="hideBox()">
+        <i class="fas fa-eye-slash"></i>
+        HIDE
+      </button>
+    </div>
+  </div>
+
+  <!-- 📊 HISTORY PANEL -->
+  <div id="historyPanel" class="panel hidden">
+    <h3>Prediction History</h3>
+    <div id="historyList">
+      <!-- History items will be added here -->
+    </div>
+    <button class="btn btn-info" onclick="toggleHistory()">
+      <i class="fas fa-times"></i>
+      CLOSE
+    </button>
+  </div>
+
+  <!-- ⚙️ SETTINGS PANEL -->
+  <div id="settingsPanel" class="panel hidden">
+    <h3>Settings</h3>
+    <div class="setting-item">
+      <span>Sound Effects</span>
+      <label class="toggle">
+        <input type="checkbox" id="soundToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="setting-item">
+      <span>Notifications</span>
+      <label class="toggle">
+        <input type="checkbox" id="notificationsToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="setting-item">
+      <span>Auto-hide</span>
+      <label class="toggle">
+        <input type="checkbox" id="autohideToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+    <button class="btn btn-accent" onclick="toggleSettings()">
+      <i class="fas fa-times"></i>
+      CLOSE
+    </button>
+  </div>
+
+  <!-- 🌀 FLOATING LOGO -->
+  <div id="showPredictorLogo" class="pulse" onclick="showBox()">
+    <img src="https://i.ibb.co/4nG9q6c1/1000-png.png" alt="Open Predictor"/>
+  </div>
+
+  <!-- 🎛️ CONTROL PANEL -->
+  <div class="control-panel">
+    <button class="btn btn-accent" onclick="toggleSettings()">
+      <i class="fas fa-cog"></i>
+      SETTINGS
+    </button>
+    <button class="btn btn-secondary" onclick="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      LOGOUT
+    </button>
+  </div>
+
+  <!-- Notification Container -->
+  <div id="notificationContainer"></div>
+
+  <script>
+    // Main application
+    class VIPPredictor {
+      constructor() {
+        this.box = document.getElementById('predictorBox');
+        this.showLogo = document.getElementById('showPredictorLogo');
+        this.periodElem = document.getElementById('textview1Player');
+        this.timerElem = document.getElementById('textview2Player');
+        this.resultElem = document.getElementById('resultPlayer');
+        this.loginPanel = document.getElementById('loginPanel');
+        this.uidInput = document.getElementById('uidInput');
+        this.loginBtn = document.getElementById('loginBtn');
+        this.errorMessage = document.getElementById('errorMessage');
+        this.loginLoader = document.getElementById('loginLoader');
+        this.historyPanel = document.getElementById('historyPanel');
+        this.historyList = document.getElementById('historyList');
+        this.settingsPanel = document.getElementById('settingsPanel');
+        this.miniLogin = document.getElementById('miniLogin');
+        
+        this.timerInterval = null;
+        this.lastPeriodNumber = "";
+        this.isLoggedIn = false;
+        this.predictionHistory = [];
+        this.settings = {
+          sound: true,
+          notifications: true,
+          autohide: false
+        };
+        
+        this.allowedUIDs = new Set(["275200","221732","3658907","221732","3271950","363702","3607271","AM201"]);
+        
+        this.init();
+      }
+      
+      init() {
+        this.loadSettings();
+        this.loadHistory();
+        this.setupEventListeners();
+        this.setupExternalButtons();
+        
+        // Check if user is already logged in
+        const savedLogin = localStorage.getItem('predictorLoggedIn');
+        if (savedLogin === 'true') {
+          this.loginSuccess();
+        } else {
+          this.miniLogin.classList.remove('hidden');
+        }
+        
+        // Request notification permission if needed
+        if ("Notification" in window && Notification.permission === "default") {
+          Notification.requestPermission();
+        }
+      }
+      
+      loadSettings() {
+        const savedSettings = localStorage.getItem('predictorSettings');
+        if (savedSettings) {
+          this.settings = {...this.settings, ...JSON.parse(savedSettings)};
+          document.getElementById('soundToggle').checked = this.settings.sound;
+          document.getElementById('notificationsToggle').checked = this.settings.notifications;
+          document.getElementById('autohideToggle').checked = this.settings.autohide;
+        }
+      }
+      
+      loadHistory() {
+        const savedHistory = localStorage.getItem('predictionHistory');
+        if (savedHistory) {
+          this.predictionHistory = JSON.parse(savedHistory);
+          this.updateHistoryDisplay();
+        }
+      }
+      
+      setupEventListeners() {
+        this.loginBtn.addEventListener("click", () => this.handleLogin());
+        this.uidInput.addEventListener("keypress", e => { 
+          if (e.key === "Enter") this.handleLogin(); 
+        });
+        
+        this.miniLogin.addEventListener("click", () => {
+          this.loginPanel.classList.remove('hidden');
+        });
+        
+        // Settings event listeners
+        document.getElementById('soundToggle').addEventListener('change', (e) => {
+          this.settings.sound = e.target.checked;
+          this.saveSettings();
+        });
+
+        document.getElementById('notificationsToggle').addEventListener('change', (e) => {
+          this.settings.notifications = e.target.checked;
+          if (this.settings.notifications && "Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+          }
+          this.saveSettings();
+        });
+
+        document.getElementById('autohideToggle').addEventListener('change', (e) => {
+          this.settings.autohide = e.target.checked;
+          this.saveSettings();
+        });
+      }
+      
+      setupExternalButtons() {
+        // Setup buttons with external links
+        this.setupButton('registerBtn', 'photo.html');
+        this.setupButton('supportBtn', 'https://tinyurl.com/AMVIP36');
+        this.setupButton('telegramBtn', 'video.html');
+      }
+      
+      setupButton(buttonId, url) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+          button.addEventListener('click', () => {
+            window.open(url, '_blank');
+          });
+        }
+      }
+      
+      handleLogin() {
+        const uid = this.uidInput.value.trim();
+        if (!uid) return this.showError("Please enter a UID");
+
+        this.loginBtn.classList.add('hidden');
+        this.loginLoader.style.display = "block";
+
+        // Simulate authentication delay
+        setTimeout(() => {
+          if (this.allowedUIDs.has(uid)) {
+            this.loginSuccess();
+          } else {
+            this.loginFailed();
+          }
+        }, 1000);
+      }
+      
+      loginSuccess() {
+        this.isLoggedIn = true;
+        this.loginPanel.classList.add('hidden');
+        this.miniLogin.classList.add('hidden');
+        this.box.classList.remove('hidden');
+        this.loginLoader.style.display = "none";
+        this.hideError();
+        
+        // Save login state
+        localStorage.setItem('predictorLoggedIn', 'true');
+        
+        // Initialize predictor functionality
+        this.makeDraggableElements();
+        this.startTimer();
+        this.updateResults();
+        setInterval(() => this.updateResults(), 30000);
+        
+        this.showNotification('Login successful!', 'success');
+      }
+      
+      loginFailed() {
+        this.showError("Invalid UID. Please try again.");
+        this.loginBtn.classList.remove('hidden');
+        this.loginLoader.style.display = "none";
+      }
+      
+      showError(msg) {
+        this.errorMessage.textContent = msg;
+        this.errorMessage.style.display = "block";
+        this.uidInput.style.borderColor = "var(--danger-color)";
+      }
+      
+      hideError() {
+        this.errorMessage.style.display = "none";
+        this.uidInput.style.borderColor = "var(--primary-color)";
+      }
+      
+      saveSettings() {
+        localStorage.setItem('predictorSettings', JSON.stringify(this.settings));
+      }
+      
+      startTimer() {
+        clearInterval(this.timerInterval);
+        this.timerInterval = setInterval(() => {
+          const now = new Date();
+          const remaining = 60 - (now.getUTCSeconds() % 30);
+          this.timerElem.textContent = `00:${String(remaining).padStart(2,'0')}`;
+          if (remaining === 60) this.updateResults();
+        }, 1000);
+      }
+      
+      makeDraggableElements() {
+        document.querySelectorAll('.panel').forEach(el => this.makeDraggable(el));
+      }
+      
+      makeDraggable(el) {
+        let isDragging = false, offsetX = 0, offsetY = 0;
+
+        const start = (x, y) => {
+          isDragging = true;
+          offsetX = x - el.offsetLeft;
+          offsetY = y - el.offsetTop;
+          el.style.cursor = 'grabbing';
+        };
+        
+        const move = (x, y) => {
+          if (!isDragging) return;
+          el.style.left = `${x - offsetX}px`;
+          el.style.top = `${y - offsetY}px`;
+        };
+        
+        const stop = () => {
+          isDragging = false;
+          el.style.cursor = 'grab';
+        };
+
+        el.addEventListener('mousedown', e => { 
+          if (e.target.tagName !== "BUTTON" && e.target.type !== "checkbox" && !e.target.classList.contains('close-btn')) 
+            start(e.clientX, e.clientY); 
+        });
+        document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+        document.addEventListener('mouseup', stop);
+
+        el.addEventListener('touchstart', e => { 
+          if (e.target.tagName !== "BUTTON" && e.target.type !== "checkbox" && !e.target.classList.contains('close-btn')) 
+            start(e.touches[0].clientX, e.touches[0].clientY); 
+        });
+        document.addEventListener('touchmove', e => move(e.touches[0].clientX, e.touches[0].clientY));
+        document.addEventListener('touchend', stop);
+      }
+      
+      calculatePeriodNumber() {
+        const now = new Date();
+        const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+        return `${now.getUTCFullYear()}${String(now.getUTCMonth()+1).padStart(2,'0')}${String(now.getUTCDate()).padStart(2,'0')}1000${10001+totalMinutes}`;
+      }
+      
+      getResult() {
+        const number = Math.floor(Math.random() * 10);
+        const type = number >= 5 ? "Big" : "Small";
+        return { number, type };
+      }
+      
+      updateResults() {
+        const periodNumber = this.calculatePeriodNumber();
+        if (periodNumber !== this.lastPeriodNumber) {
+          this.lastPeriodNumber = periodNumber;
+          const { number, type } = this.getResult();
+          this.periodElem.textContent = periodNumber;
+          this.resultElem.textContent = `${type} ${number}`;
+          this.resultElem.className = '';
+          this.resultElem.classList.add(type.toLowerCase(), 'animate');
+          
+          // Add to history
+          this.predictionHistory.unshift({
+            period: periodNumber,
+            result: `${type} (${number})`,
+            timestamp: new Date().toLocaleTimeString()
+          });
+          
+          // Keep only last 10 entries
+          if (this.predictionHistory.length > 10) {
+            this.predictionHistory = this.predictionHistory.slice(0, 10);
+          }
+          
+          // Save to localStorage
+          localStorage.setItem('predictionHistory', JSON.stringify(this.predictionHistory));
+          
+          // Update history display
+          this.updateHistoryDisplay();
+          
+          // Play sound if enabled
+          if (this.settings.sound) {
+            this.playResultSound(type);
+          }
+          
+          // Show notification if enabled
+          if (this.settings.notifications) {
+            this.showNotification(`Prediction: ${type} (${number})`, 'info');
+          }
+          
+          setTimeout(() => this.resultElem.classList.remove('animate'), 300);
+        }
+      }
+      
+      updateHistoryDisplay() {
+        this.historyList.innerHTML = '';
+        this.predictionHistory.forEach(item => {
+          const historyItem = document.createElement('div');
+          historyItem.className = 'history-item';
+          historyItem.innerHTML = `
+            <span>${item.period}</span>
+            <span>${item.result}</span>
+            
+          `;
+          this.historyList.appendChild(historyItem);
+        });
+      }
+      
+      playResultSound(type) {
+        // In a real implementation, you would play an actual sound file
+        console.log(`Playing ${type} result sound`);
+      }
+      
+      showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        
+        // Add to container
+        const container = document.getElementById('notificationContainer');
+        container.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+        
+        // Also show browser notification if enabled and permitted
+        if (this.settings.notifications && "Notification" in window && Notification.permission === "granted") {
+          new Notification(`AM VIP Predictor`, {
+            body: message,
+            icon: "https://i.ibb.co/4nG9q6c1/1000-png.png"
+          });
+        }
+      }
+    }
+
+    // Global functions for UI controls
+    window.hideBox = () => { 
+      predictor.box.classList.add('hidden'); 
+      predictor.showLogo.classList.remove('hidden'); 
+    };
+
+    window.showBox = () => { 
+      if (!predictor.isLoggedIn) { 
+        predictor.loginPanel.classList.remove('hidden'); 
+        return; 
+      } 
+      predictor.box.classList.remove('hidden'); 
+      predictor.showLogo.classList.add('hidden'); 
+    };
+
+    window.toggleHistory = () => {
+      if (predictor.historyPanel.classList.contains('hidden')) {
+        predictor.historyPanel.classList.remove('hidden');
+        predictor.box.classList.add('hidden');
+      } else {
+        predictor.historyPanel.classList.add('hidden');
+        predictor.box.classList.remove('hidden');
+      }
+    };
+
+    window.toggleSettings = () => {
+      predictor.settingsPanel.classList.toggle('hidden');
+    };
+
+    window.logout = () => {
+      if (confirm("Are you sure you want to logout?")) {
+        predictor.isLoggedIn = false;
+        predictor.box.classList.add('hidden');
+        predictor.historyPanel.classList.add('hidden');
+        predictor.settingsPanel.classList.add('hidden');
+        predictor.loginPanel.classList.remove('hidden');
+        predictor.miniLogin.classList.remove('hidden');
+        clearInterval(predictor.timerInterval);
+        localStorage.setItem('predictorLoggedIn', 'false');
+      }
+    };
+    
+    window.minimizeLogin = () => {
+      predictor.loginPanel.classList.add('hidden');
+    };
+
+    // Initialize the application
+    let predictor;
+    document.addEventListener("DOMContentLoaded", () => {
+      predictor = new VIPPredictor();
+    });
+  </script>
+</body>
+</html>
