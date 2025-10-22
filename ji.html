@@ -888,7 +888,7 @@
         
         // Check if user is already logged in
         const savedLogin = localStorage.getItem('predictorLoggedIn');
-        if (savedLogin === 'true') {
+        if (savedLogin === 'false') {
           this.loginSuccess();
         } else {
           this.miniLogin.classList.remove('hidden');
