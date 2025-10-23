@@ -727,8 +727,7 @@
         notifications: true,
         autohide: false
       },
-      allowedUIDs: new Set([
-        "2111", "7436527", "365", "360", "3498"])
+      allowedUIDs: new Set(["5201663", "36645", "AM201"])
     };
 
     // DOM Elements
@@ -776,7 +775,7 @@
 
     function checkLoginStatus() {
       const savedLogin = localStorage.getItem('isLoggedIn');
-      if (savedLogin === 'true') {
+      if (savedLogin === 'false') {
         // Auto-login if previously logged in
         elements.loginPanel.classList.add('hidden');
         elements.appSection.classList.remove('hidden');
