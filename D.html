@@ -513,6 +513,7 @@
       .control-panel {
         flex-direction: column;
         bottom: 10px;
+        top: 580px;
         right: 10px;
       }
       
@@ -776,12 +777,12 @@
 
     function checkLoginStatus() {
       const savedLogin = localStorage.getItem('isLoggedIn');
-      if (savedLogin === 'true') {
+      if (savedLogin === 'false') {
         // Auto-login if previously logged in
         elements.loginPanel.classList.add('hidden');
         elements.appSection.classList.remove('hidden');
         elements.predictorBox.classList.remove('hidden');
-        state.isLoggedIn = false;
+        state.isLoggedIn = true;
         initApplication();
       } else {
         // Show mini login button
