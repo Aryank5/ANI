@@ -27,7 +27,7 @@
           autohide: false
         };
         
-        this.allowedUIDs = new Set(["24120533","2232jn","381iu7","A210"]);
+        this.allowedUIDs = new Set(["24133","2232jn","381iu7","A210"]);
     
         this.init();
       }
