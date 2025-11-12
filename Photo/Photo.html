@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot Gallery</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --panel-bg: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --text: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --error: #e74c3c;
+            --success: #2ecc71;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .small {
+            font-size: 14px;
+        }
+
+        .meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .upload-container {
+            margin-bottom: 20px;
+        }
+
+        .upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-box:hover, .upload-box.dragover {
+            border-color: var(--highlight);
+            background: rgba(233, 69, 96, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .upload-info {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .upload-input {
+            display: none;
+        }
+
+        .guidelines {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 14px;
+        }
+
+        .guidelines ul {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .guidelines li {
+            margin-bottom: 6px;
+        }
+
+        .btn {
+            background: var(--highlight);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: #d63447;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+        }
+
+        .btn.ghost:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .preview-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .preview-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+
+        .icon-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .screenshot-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .screenshot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .screenshot-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .screenshot-card:hover .card-actions {
+            opacity: 1;
+        }
+
+        .timestamp {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: 8px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .load-more-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .footer-tracking {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 20px;
+        }
+
+        .side-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .import-input {
+            display: none;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            max-width: 300px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--error);
+        }
+
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .lightbox.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .lightbox .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .lightbox .close:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        hr {
+            border: none;
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="grid">
+            <!-- LEFT: Upload & Gallery -->
+            <div>
+                <div class="panel upload-container" aria-labelledby="upload-title">
+                    <h1 id="upload-title" class="section-title">Submit Your Winning Screenshots</h1>
+                    <p class="subtitle">Help us improve trust in the app by sharing your successful predictions</p>
+
+                    <div id="uploadBox" class="upload-box" tabindex="0" role="button" aria-label="Upload screenshot (click or drag and drop)">
+                        <div class="upload-icon">⬆</div>
+                        <div class="upload-text">Click to upload or drag &amp; drop images here</div>
+                        <div class="upload-info">PNG, JPG, WebP — up to <strong>5MB</strong></div>
+                        <input id="fileInput" class="upload-input" type="file" accept="image/png,image/jpeg,image/webp" multiple aria-hidden="false">
+                    </div>
+
+                    <div class="guidelines" aria-hidden="false">
+                        <h3 class="small">Submission Guidelines</h3>
+                        <ul>
+                            <li>Submit clear screenshots of your winning predictions</li>
+                            <li>Maximum single file size: <strong>5MB</strong></li>
+                            <li>Supported formats: <strong>JPG, PNG, WebP</strong></li>
+                            <li>Images are reviewed before publishing (demo: they appear immediately in local gallery)</li>
+                        </ul>
+                    </div>
+
+                    <div style="margin-top:14px;display:flex;gap:10px;align-items:center;">
+                        <div class="preview-row" id="previewRow" aria-live="polite"></div>
+                        <button id="uploadBtn" class="btn" title="Upload">Upload</button>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:16px;">
+                    <h2 class="section-title">Color Prediction Game Winning Screenshots</h2>
+                    <p class="small">Discover verified winning screenshots from our community. Click any thumbnail to preview full size.</p>
+
+                    <div id="grid" class="screenshot-grid" aria-live="polite" aria-label="Gallery thumbnails"></div>
+
+                    <div class="load-more-wrap">
+                        <button id="loadMore" class="btn ghost" title="Load more images"><span id="spinner" style="display:none" class="spinner"></span><span id="btnText">Load More</span></button>
+                    </div>
+
+                    <p class="footer-tracking">Showing <strong id="shownCount">0</strong> of <strong id="totalCount">0</strong> winning screenshots</p>
+                </div>
+            </div>
+
+            <!-- RIGHT: Actions & Backup -->
+            <aside class="side-actions">
+                <div class="panel">
+                    <h3 class="section-title" style="font-size:16px">Controls & Backup</h3>
+                    <p class="meta">Manage gallery, export/import backups, or clear all.</p>
+                    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                        <button id="exportBtn" class="btn ghost" title="Export JSON backup">Export JSON</button>
+                        <label class="btn ghost" for="importInput" style="cursor:pointer">Import JSON<input id="importInput" class="import-input" type="file" accept="application/json"></label>
+                            <div id="clearBtn"></div>
+
+                    </div>
+
+                    <hr />
+                    <div class="meta">Storage</div>
+                    <div style="margin-top:8px">
+                        <div class="meta">LocalStorage used for demo only — not suitable for many images. For a production-ready solution choose Firebase / server upload.</div>
+                    </div>
+                </div>
+
+                <div class="panel" style="display:flex;flex-direction:column;gap:8px;">
+                    <div>
+                        <div class="meta">Quick tips</div>
+                        <ul style="padding-left:18px;margin:6px 0 0">
+                            <li style="font-size:13px">Use export to back up before clearing or switching devices.</li>
+                            <li style="font-size:13px">If storage fails, consider switching to cloud storage.</li>
+                        </ul>
+                    </div>
+                    <div style="margin-top:6px">
+                        <div class="meta">Preview</div>
+                        <div class="preview-row" id="smallPreview"></div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+        <button class="close" id="lbClose" aria-label="Close preview">✕</button>
+        <button id="lbPrev" class="icon-btn" style="position:absolute;left:18px;top:50%;transform:translateY(-50%);">◀</button>
+        <img id="lbImage" alt="Preview image">
+        <button id="lbNext" class="icon-btn" style="position:absolute;right:18px;top:50%;transform:translateY(-50%);">▶</button>
+    </div>
+
+    <script>
+        /* ========== Configuration ========== */
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        const ALLOWED_TYPES = ['image/png','image/jpeg','image/webp'];
+        const STORAGE_KEY = 'winning_screenshots_v1';
+        const PAGE_SIZE = 30; // shown per "page"
+        let pageIndex = 0; // for load more
+
+        /* ========== Helpers ========== */
+        const $ = sel => document.querySelector(sel);
+        const qs = sel => Array.from(document.querySelectorAll(sel));
+        const toastEl = $('#toast');
+
+        function showToast(message, type='success', ms=3000){
+            toastEl.textContent = message;
+            toastEl.className = 'toast ' + (type==='error' ? 'error' : 'success') + ' show';
+            setTimeout(()=>{toastEl.className = 'toast';}, ms);
+        }
+
+        /* ========== Local Storage model ==========
+        We store an array of items:
+        [{ id, name, size, type, dataUrl, ts }]
+        ==========================================*/
+        function loadStore(){
+            try{
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if(!raw) return [];
+                return JSON.parse(raw);
+            }catch(e){
+                console.warn('Failed parse store', e);
+                return [];
+            }
+        }
+        function saveStore(arr){
+            try{
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+                return true;
+            }catch(e){
+                console.error('saveStore error', e);
+                return false;
+            }
+        }
+
+        /* ========== UI elements ========== */
+        const uploadBox = $('#uploadBox');
+        const fileInput = $('#fileInput');
+        const previewRow = $('#previewRow');
+        const uploadBtn = $('#uploadBtn');
+        const grid = $('#grid');
+        const loadMoreBtn = $('#loadMore');
+        const spinner = $('#spinner');
+        const shownCountEl = $('#shownCount');
+        const totalCountEl = $('#totalCount');
+        const btnText = $('#btnText');
+        const smallPreview = $('#smallPreview');
+        const exportBtn = $('#exportBtn');
+        const importInput = $('#importInput');
+        const clearBtn = $('#clearBtn');
+        const previewSmall = $('#smallPreview');
+
+        /* upload staging */
+        let staging = []; // files selected but not yet uploaded
+
+        /* ========== Drag & drop & file selection ========== */
+        function preventDefaults(e){e.preventDefault();e.stopPropagation();}
+        ['dragenter','dragover','dragleave','drop'].forEach(evt=>uploadBox.addEventListener(evt,preventDefaults));
+        ['dragenter','dragover'].forEach(evt=>{
+            uploadBox.addEventListener(evt,()=>uploadBox.classList.add('dragover'));
+        });
+        ['dragleave','drop'].forEach(evt=>{
+            uploadBox.addEventListener(evt,()=>uploadBox.classList.remove('dragover'));
+        });
+        uploadBox.addEventListener('drop',(e)=>{
+            const dt = e.dataTransfer;
+            const files = Array.from(dt.files || []);
+            handleFiles(files);
+        });
+        uploadBox.addEventListener('click',()=>fileInput.click());
+        fileInput.addEventListener('change',e=>{
+            const files = Array.from(e.target.files || []);
+            handleFiles(files);
+        });
+
+        /* allow keyboard activation */
+        uploadBox.addEventListener('keydown', e=>{
+            if(e.key==='Enter' || e.key===' ') fileInput.click();
+        });
+
+        /* ========== File processing ========== */
+        function handleFiles(files){
+            let added = 0;
+            files.forEach(file=>{
+                if(!ALLOWED_TYPES.includes(file.type)){
+                    showToast('Unsupported file type: ' + file.name, 'error', 3500);
+                    return;
+                }
+                if(file.size > MAX_FILE_SIZE){
+                    showToast('File too large: ' + file.name, 'error', 3500);
+                    return;
+                }
+                // read preview only
+                const reader = new FileReader();
+                reader.onload = ev=>{
+                    staging.push({name:file.name,size:file.size,type:file.type,dataUrl:ev.target.result});
+                    renderStaging();
+                };
+                reader.readAsDataURL(file);
+                added++;
+            });
+            if(added) showToast(`${added} file(s) ready to upload`);
+        }
+
+        function renderStaging(){
+            previewRow.innerHTML = '';
+            smallPreview.innerHTML = '';
+            staging.forEach((item, idx)=>{
+                const thumb = document.createElement('div');
+                thumb.className = 'preview-thumb';
+                thumb.title = item.name;
+                thumb.innerHTML = `<img src="${item.dataUrl}" style="width:100%;height:100%;object-fit:cover">`;
+                // add little remove button overlay
+                const rem = document.createElement('button');
+                rem.className = 'icon-btn';
+                rem.style.position='absolute';
+                rem.style.marginLeft='6px';
+                rem.style.marginTop='6px';
+                rem.title='Remove';
+                rem.innerText='✕';
+                rem.onclick = (e)=>{
+                    e.stopPropagation();
+                    staging.splice(idx,1);
+                    renderStaging();
+                };
+                const container = document.createElement('div');
+                container.style.position='relative';
+                container.appendChild(thumb);
+                container.appendChild(rem);
+                previewRow.appendChild(container);
+
+                // small preview on right
+                const s = document.createElement('div');
+                s.className='preview-thumb';
+                s.style.width='56px'; s.style.height='56px';
+                s.innerHTML = `<img src="${item.dataUrl}" style="width:100%;height:100%;object-fit:cover">`;
+                smallPreview.appendChild(s);
+            });
+
+            uploadBtn.disabled = staging.length === 0;
+        }
+
+        /* ========== Upload (save to localStorage) ========== */
+        uploadBtn.addEventListener('click', async ()=>{
+            if(staging.length===0) return;
+            uploadBtn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Uploading...';
+            // simulate processing — but we must actually save
+            try{
+                const store = loadStore();
+                let added = 0;
+                for(const item of staging){
+                    // create id and timestamp
+                    const id = 'img_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+                    const entry = {
+                        id, name: item.name, size: item.size, type: item.type,
+                        dataUrl: item.dataUrl,
+                        ts: new Date().toISOString()
+                    };
+                    store.unshift(entry); // newest first
+                    added++;
+                }
+                const ok = saveStore(store);
+                if(!ok){
+                    showToast('Failed to save: storage might be full. Export and use server storage.', 'error', 5000);
+                } else {
+                    showToast(added + ' image(s) uploaded');
+                    staging = [];
+                    renderStaging();
+                    // refresh grid and reset pagination to show newest
+                    pageIndex = 0;
+                    renderGrid(true);
+                }
+            }catch(err){
+                console.error(err);
+                showToast('Upload error', 'error');
+            }finally{
+                uploadBtn.disabled = false;
+                spinner.style.display = 'none';
+                btnText.textContent = 'Load More';
+            }
+        });
+
+        /* ========== Grid rendering & pagination ========== */
+        function formatTs(iso){
+            try{
+                const d = new Date(iso);
+                return d.toLocaleString();
+            }catch(e){
+                return iso;
+            }
+        }
+
+        function renderGrid(reset=false){
+            const store = loadStore();
+            totalCountEl.textContent = store.length;
+            if(reset){
+                grid.innerHTML = '';
+                pageIndex = 0;
+            }
+            // the gallery shows PAGE_SIZE items per page
+            const start = pageIndex * PAGE_SIZE;
+            const slice = store.slice(start, start + PAGE_SIZE);
+            slice.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'screenshot-card';
+                card.setAttribute('data-id', item.id);
+                card.innerHTML = `
+                    <img src="${item.dataUrl}" alt="${escapeHtml(item.name)}">
+                    <div class="card-actions">
+                        <button class="icon-btn view-btn" title="View">🔍</button>
+                        <button class="icon-btn del-btn" title="Delete">🗑</button>
+                    </div>
+                    <div class="timestamp">${formatTs(item.ts)}</div>
+                `;
+                // view
+                card.querySelector('.view-btn').addEventListener('click', ()=>openLightbox(item.id));
+                // delete
+                card.querySelector('.del-btn').addEventListener('click', (e)=>{
+                    e.stopPropagation();
+                    if(!confirm('Delete this image?')) return;
+                    deleteImageById(item.id);
+                });
+                // clicking anywhere opens lightbox
+                card.addEventListener('click', (e)=>{
+                    if(e.target.closest('.del-btn')) return;
+                    openLightbox(item.id);
+                });
+                grid.appendChild(card);
+            });
+
+            // update shown count
+            const shown = Math.min((pageIndex+1)*PAGE_SIZE, store.length);
+            shownCountEl.textContent = shown;
+            totalCountEl.textContent = store.length;
+
+            // disable load more if none left
+            if((pageIndex+1)*PAGE_SIZE >= store.length) {
+                loadMoreBtn.disabled = true;
+                btnText.textContent = 'All Loaded';
+            } else {
+                loadMoreBtn.disabled = false;
+                btnText.textContent = 'Load More';
+            }
+        }
+
+        loadMoreBtn.addEventListener('click', ()=>{
+            // load next page
+            pageIndex++;
+            // show spinner briefly
+            spinner.style.display = 'inline-block';
+            loadMoreBtn.disabled = true;
+            setTimeout(()=>{
+                renderGrid();
+                spinner.style.display = 'none';
+            }, 350);
+        });
+
+        /* delete helper */
+        function deleteImageById(id){
+            const store = loadStore();
+            const idx = store.findIndex(x=>x.id===id);
+            if(idx===-1){ showToast('Image not found', 'error'); return; }
+            store.splice(idx,1);
+            const ok = saveStore(store);
+            if(ok){
+                showToast('Deleted');
+                // re-render the gallery
+                pageIndex = 0;
+                renderGrid(true);
+            } else {
+                showToast('Failed to delete', 'error');
+            }
+        }
+
+        /* ========== Lightbox (fullscreen preview) ========== */
+        const lightbox = $('#lightbox');
+        const lbImage = $('#lbImage');
+        const lbClose = $('#lbClose');
+        const lbPrev = $('#lbPrev');
+        const lbNext = $('#lbNext');
+        let currentLightboxIndex = -1;
+
+        function openLightbox(id){
+            const store = loadStore();
+            const idx = store.findIndex(x=>x.id===id);
+            if(idx===-1) return;
+            currentLightboxIndex = idx;
+            showLBForIndex(idx);
+            lightbox.classList.add('show');
+            lightbox.setAttribute('aria-hidden','false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showLBForIndex(idx){
+            const store = loadStore();
+            if(idx < 0 || idx >= store.length) return;
+            const item = store[idx];
+            lbImage.src = item.dataUrl;
+            lbImage.alt = item.name;
+        }
+
+        function closeLightbox(){
+            lightbox.classList.remove('show');
+            lightbox.setAttribute('aria-hidden','true');
+            document.body.style.overflow = '';
+        }
+
+        lbClose.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e)=>{
+            if(e.target === lightbox) closeLightbox();
+        });
+        lbPrev.addEventListener('click', ()=>{
+            const store = loadStore();
+            if(store.length===0) return;
+            currentLightboxIndex = (currentLightboxIndex - 1 + store.length) % store.length;
+            showLBForIndex(currentLightboxIndex);
+        });
+        lbNext.addEventListener('click', ()=>{
+            const store = loadStore();
+            if(store.length===0) return;
+            currentLightboxIndex = (currentLightboxIndex + 1) % store.length;
+            showLBForIndex(currentLightboxIndex);
+        });
+
+        /* keyboard navigation for lightbox and general */
+        document.addEventListener('keydown',(e)=>{
+            if(lightbox.classList.contains('show')){
+                if(e.key==='Escape') closeLightbox();
+                if(e.key==='ArrowLeft') lbPrev.click();
+                if(e.key==='ArrowRight') lbNext.click();
+            }
+        });
+
+        /* ========== Export / Import / Clear ========== */
+        exportBtn.addEventListener('click', ()=>{
+            const data = localStorage.getItem(STORAGE_KEY) || '[]';
+            const blob = new Blob([data], {type:'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'winning_screenshots_backup.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            showToast('Export started');
+        });
+
+        importInput.addEventListener('change', ()=>{
+            const file = importInput.files[0];
+            if(!file) return;
+            if(file.type !== 'application/json' && !file.name.endsWith('.json')){
+                showToast('Please select a JSON file', 'error');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = e=>{
+                try{
+                    const arr = JSON.parse(e.target.result);
+                    if(!Array.isArray(arr)){
+                        showToast('Invalid backup file', 'error');
+                        return;
+                    }
+                    // Replace or merge? We'll merge unique ids to existing store
+                    const store = loadStore();
+                    const existingIds = new Set(store.map(s=>s.id));
+                    let added = 0;
+                    arr.forEach(item=>{
+                        if(!item.id) return;
+                        if(existingIds.has(item.id)) return;
+                        store.push(item); added++;
+                    });
+                    saveStore(store);
+                    showToast('Imported ' + added + ' images');
+                    pageIndex = 0;
+                    renderGrid(true);
+                }catch(err){
+                    console.error(err);
+                    showToast('Failed to import', 'error');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        clearBtn.addEventListener('click', ()=>{
+            if(!confirm('Clear ALL images from localStorage? This cannot be undone unless you exported a backup.')) return;
+            localStorage.removeItem(STORAGE_KEY);
+            showToast('Cleared');
+            pageIndex = 0;
+            renderGrid(true);
+        });
+
+        /* ========== Utils ========== */
+        function escapeHtml(s){
+            return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+        }
+
+        /* ========== Init: render existing store ========= */
+        (function init(){
+            // For demo, if localStorage empty, seed a few placeholders? We'll keep empty.
+            renderGrid(true);
+            // small preview initial
+            const store = loadStore();
+            if(store.length){
+                smallPreview.innerHTML = '';
+                for(let i=0;i<Math.min(6,store.length);i++){
+                    const s = document.createElement('div');
+                    s.className='preview-thumb';
+                    s.style.width='56px'; s.style.height='56px';
+                    s.innerHTML = `<img src="${store[i].dataUrl}" style="width:100%;height:100%;object-fit:cover">`;
+                    smallPreview.appendChild(s);
+                }
+            }
+        })();
+
+        /* ========== Storage quota check (best-effort) =========*/
+        function estimateLocalStorageUsage(){
+            // rough size estimation of STORAGE_KEY value in bytes
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? new Blob([raw]).size : 0;
+        }
+        // warn when nearing typical quota
+        setInterval(()=>{
+            const used = estimateLocalStorageUsage();
+            // warn at >4MB usage
+            if(used > 4 * 1024 * 1024){
+                console.warn('LocalStorage used bytes:', used);
+                // don't spam user; show once
+                if(!sessionStorage.getItem('ls-warning-shown')){
+                    showToast('LocalStorage nearing limit. Consider exporting or using cloud storage.', 'error', 6000);
+                    sessionStorage.setItem('ls-warning-shown','1');
+                }
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
